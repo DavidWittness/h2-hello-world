@@ -1,10 +1,8 @@
 import {useLoaderData} from '@remix-run/react';
-import type {LoaderArgs} from '@shopify/remix-oxygen';
 import {json} from 'react-router';
 import ProductOptions from '~/components/ProductOptions';
-// import {Image} from '@shopify/hydrogen';
 
-export const loader = async ({params, context, request}: LoaderArgs) => {
+export const loader = async ({params, context, request}) => {
   const {handle} = params;
   const searchParams = new URL(request.url).searchParams;
   const selectedOptions = [];
@@ -23,53 +21,51 @@ export const loader = async ({params, context, request}: LoaderArgs) => {
 
   const {product} = data;
 
-  /**
-   * Likewise, we're defaulting to the first variant for purposes
-   * of add to cart if there is none returned from the loader.
-   * A developer can opt out of this, too.
-   */
-  const selectedVariant = product.selectedVariant ?? product.variants.nodes[0];
-
   return json({
     handle,
     product,
-    selectedVariant,
   });
 };
 
-export function Test() {
+export default function ProductHandle() {
+  const {handle, product} = useLoaderData();
+
+  const {vendor, title, descriptionHtml} = product;
+  const mainImage = product.media.nodes[0].image;
+
   return (
-    <div className="product-wrapper">
-      <h2>Product Content will go here</h2>
-    </div>
+    <section className="w-full grid md:px-8 lg:px-12 px-0">
+      <div className="grid md:gap-6 lg:gap-20 md:grid-cols-2 lg:grid-cols-3">
+        <div className="w-screen md:w-full lg:col-span-2 md:grid-flow-row md:p-0 md:overflow-x-auto md:grid-cols-2">
+          <div className="md:col-span-2 bg-white md:w-full">
+            <img
+              src={mainImage.url}
+              alt={mainImage.altText || 'alt text'}
+              className="w-full h-full aspect-square"
+            />
+          </div>
+        </div>
+        <div className="sticky md:-mb-nav md:top-nav md:-translate-y-nav md:h-screen md:pt-nav hiddenScroll md:overflow-y-scroll p-6">
+          <h1 className="text-4xl max-w-prose font-bold mb-2">{title}</h1>
+          <span className="opacity-50">{vendor}</span>
+          <div
+            className="prose mb-4"
+            dangerouslySetInnerHTML={{__html: descriptionHtml}}
+          />
+          <ProductOptions options={product.options} />
+        </div>
+      </div>
+      <PrintJson data={product} />
+    </section>
   );
 }
 
-export default function ProductHandle() {
-  const {handle, product, selectedVariant} = useLoaderData();
+function PrintJson({data}) {
   return (
-    <>
-      <div className="product-wrapper">
-        <div className="product-media">
-          <img
-            src={product.media.nodes[0].image.url}
-            alt={product.media.nodes[0].image.altText || 'alt text'}
-            className="product-image"
-          />
-        </div>
-        <div className="product-details">
-          <h2>{product.title}</h2>
-          <p>{product.vendor}</p>
-          <p dangerouslySetInnerHTML={{__html: product.descriptionHtml}} />
-          <ProductOptions options={product.options} />
-          <p>selected: {selectedVariant.title}</p>
-        </div>
-      </div>
-      <details>
-        <summary>Product JSON</summary>
-        <pre>{JSON.stringify(product, null, 2)}</pre>
-      </details>
-    </>
+    <details>
+      <summary>Product JSON</summary>
+      <pre>{JSON.stringify(data, null, 2)}</pre>
+    </details>
   );
 }
 

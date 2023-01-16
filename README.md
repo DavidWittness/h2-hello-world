@@ -12,6 +12,10 @@ A minimal setup of components, queries and tooling to get started with Hydrogen.
 ## TODO
 
 - Everything in `lib` folder will maybe need to be abstracted into a shared module
+- Rebuild this example with something closer to the release candidate of the hello world template
+- Add in basic testing for our own purposes?
+- Helpful comments
+- Deploy to Gitpod/Stackblitz button?
 
 ## Questions
 
